@@ -1,0 +1,46 @@
+# 数据文件 (过大)
+data/raw/
+data/processed/
+data/external/
+
+# 结果文件 (可重新生成)
+results/figures/
+results/tables/
+results/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+
+# Conda
+env/
+
+# 大文件
+*.tar.gz
+*.zip
+*.fna.gz
+*.faa.gz
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 敏感配置文件 (含服务器IP、密钥路径)
+config/
+server/
+
+# 临时文件
+tmp/
+temp/
+*.tmp

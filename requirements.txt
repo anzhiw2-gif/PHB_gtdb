@@ -1,0 +1,22 @@
+# PHB_gtdb — Python 依赖包
+# 服务器安装: pip install -r requirements.txt
+
+# === 核心 ===
+biopython>=1.83
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# === 可视化 ===
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# === 配置与日志 ===
+pyyaml>=6.0
+tqdm>=4.65.0
+
+# === ETE3 (系统发育树可视化) ===
+ete3>=3.1.3
+
+# === Jupyter ===
+jupyter>=1.0.0
