@@ -25,6 +25,7 @@ GTDB_ROOT = Path("/home/data/haoyu/GTDB")
 GTDB_GENOMES = GTDB_ROOT / "gtdb_genomes_reps_r232" / "database"
 GTDB_METADATA = GTDB_ROOT / "metadata" / "bac120_metadata_r232.tsv"
 GTDB_TAXONOMY = GTDB_ROOT / "taxonomy" / "bac120_taxonomy_r232.tsv"
+GTDB_TAXONOMY_AR53 = GTDB_ROOT / "taxonomy" / "ar53_taxonomy_r232.tsv"
 GTDB_TREE = GTDB_ROOT / "GTDB_tree" / "bac120_r232.tree"
 
 # Conda 环境路径 (无需 sudo)

@@ -79,9 +79,16 @@ def download_phaz_references(output_dir: Path, logger: logging.Logger):
 
 
 def get_archaeal_genomes(logger: logging.Logger) -> List[Path]:
-    """获取古菌基因组列表。"""
-    logger.info("加载 GTDB 分类学...")
-    taxonomy = load_gtdb_taxonomy()
+    """获取古菌基因组列表。加载细菌+古菌分类文件。"""
+    logger.info("加载 GTDB 分类学 (bac120 + ar53)...")
+
+    # 加载细菌分类
+    taxonomy_bac = load_gtdb_taxonomy()
+    # 加载古菌分类
+    taxonomy_arc = load_gtdb_taxonomy(GTDB_TAXONOMY_AR53)
+    # 合并
+    taxonomy = pd.concat([taxonomy_bac, taxonomy_arc], ignore_index=True)
+    logger.info(f"分类记录: 细菌 {len(taxonomy_bac)} + 古菌 {len(taxonomy_arc)} = {len(taxonomy)}")
 
     domain_map = {}
     for _, row in tqdm(taxonomy.iterrows(), total=len(taxonomy), desc="解析分类"):
