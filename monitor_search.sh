@@ -332,6 +332,12 @@ show_log_tail() {
         LOG="$LOGS_DIR/01b_archaea_search.log"
     elif [ -f "$LOGS_DIR/01_phb_search.log" ]; then
         LOG="$LOGS_DIR/01_phb_search.log"
+    else
+        # 查找带时间戳的最新日志
+        LOG=$(ls -t "$LOGS_DIR"/01b_archaea_search_*.log 2>/dev/null | head -1)
+        if [ -z "$LOG" ]; then
+            LOG=$(ls -t "$LOGS_DIR"/01_phb_search_*.log 2>/dev/null | head -1)
+        fi
     fi
 
     if [ -n "$LOG" ]; then
