@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """
-PHB_gtdb — Step 1: PhaZ 降解基因搜索 (优化版)
+PHB_gtdb — Step 1b: 古菌 PhaZ 降解基因搜索
+验证古菌中是否存在 phaZ 基因 (预期: 无命中)
 
-优化点:
-- Pyrodigal (进程内基因预测, 无 subprocess 开销)
-- DIAMOND (比 BLASTP 快 100-1000x)
-- chunksize=1 负载均衡
-- 增量保存 + 断点续传
+与 01_phb_search.py 相同逻辑，但只搜索古菌基因组。
 
 用法:
-    conda run -n phb_gtdb python 01_phb_search.py --threads 30
-    conda run -n phb_gtdb python 01_phb_search.py --threads 30 --limit 100  # 测试
+    conda run -n phb_gtdb python 01b_archaea_search.py --threads 30
+    conda run -n phb_gtdb python 01b_archaea_search.py --threads 30 --limit 100  # 测试
 """
 
 import os, sys, gzip, time, shutil, argparse, logging
@@ -32,69 +29,34 @@ from utils import setup_logging, run_cmd, load_gtdb_taxonomy, parse_gtdb_taxonom
 # ==============================================================================
 PHAZ_REFERENCES = {
     # === 胞外型 PhaZ (含 lipase box + 信号肽) ===
-    # Stutzerimonas stutzeri (Pseudomonas stutzeri) — 576aa, S163-D240-H289
-    # 文献: Ohura et al., 1999, Appl Environ Microbiol. PMID: PMC91002
-    "phaZ_Pst":     "BAA32541.1",
-    # Comamonas testosteroni 31A — PHA depolymerase precursor
-    # 文献: Jendrossek et al., 1995. GenBank: U16275.1
-    "phaZ_Cte":     "AAA87070.1",
-    # Acidovorax sp. TP4 — PHB depolymerase, Type II 催化域
-    # GenBank: AB015309.1
-    "phaZ_Asp":     "BAA35137.1",
-    # Delftia acidovorans (Comamonas acidovorans) — PHB depolymerase
-    # GenBank: AB003186.1
-    "phaZ_Dac":     "BAA19791.1",
-    # Streptomyces exfoliatus — 胞外型, 革兰氏阳性菌
-    # 文献: García-Hidalgo et al., 2012. GenBank: U58990.1
-    "phaZ_Sex":     "AAB02914.1",
-    # Paucimonas lemoignei — PHA depolymerase C (PhaZ3), Swiss-Prot 审阅
-    # UniProt: P52090
-    "phaZ_Ple3":    "P52090.1",
-    # Paucimonas lemoignei — 胞外型 Type I 催化域
-    "phaZ_Ple1":    "WP_243656647.1",
-    "phaZ_Ple2":    "WP_207907290.1",
-
+    "phaZ_Pst":     "BAA32541.1",     # Stutzerimonas stutzeri — PMID: PMC91002
+    "phaZ_Cte":     "AAA87070.1",     # Comamonas testosteroni — U16275.1
+    "phaZ_Asp":     "BAA35137.1",     # Acidovorax sp. TP4 — AB015309.1
+    "phaZ_Dac":     "BAA19791.1",     # Delftia acidovorans — AB003186.1
+    "phaZ_Sex":     "AAB02914.1",     # Streptomyces exfoliatus — U58990.1
+    "phaZ_Ple3":    "P52090.1",       # Paucimonas lemoignei — Swiss-Prot
+    "phaZ_Ple1":    "WP_243656647.1", # P. lemoignei — Type I
+    "phaZ_Ple2":    "WP_207907290.1", # P. lemoignei — Type I
     # === 胞内型 PhaZ (无 lipase box) ===
-    # Cupriavidus necator H16 PhaZ1 — 首个克隆的胞内 PhaZ, 419aa
-    # 文献: Saegusa et al., 2001, J Bacteriol. PMID: PMC94854
-    "phaZ_Cne1":    "BAA33394.1",
-    # C. necator H16 PhaZ2 — 胞内型
-    # 文献: Pohlmann et al., 2006, Nat Biotechnol.
-    "phaZ_Cne2":    "CAJ93939.1",
-    # C. necator H16 PhaZ5/PhaZd — 胞内型
-    "phaZ_Cne5":    "CAJ95805.1",
-
+    "phaZ_Cne1":    "BAA33394.1",     # C. necator PhaZ1 — PMID: PMC94854
+    "phaZ_Cne2":    "CAJ93939.1",     # C. necator PhaZ2
+    "phaZ_Cne5":    "CAJ95805.1",     # C. necator PhaZ5
     # === 其他 ===
-    # Ralstonia pickettii — PHA depolymerase
-    "phaZ_Rpi":     "WKZ88401.1",
-    "phaZ_Rpi2":    "UCA14981.1",
-    # Bacillus sp. CDB3 — 胞内型, 含 lipase box (新型 PhaZ), 革兰氏阳性菌
-    # 文献: Tseng et al., 2006, J Bacteriol. PMID: PMC1636284
-    "phaZ_Bsp":     "WP_128854079.1",
-}
-
-# GTDB 细菌门
-BACTERIAL_PHYLA = {
-    "Pseudomonadota", "Actinomycetota", "Bacillota", "Bacteroidota",
-    "Myxococcota", "Cyanobacteriota", "Chloroflexota", "Bdellovibrionota",
-    "Desulfobacterota", "Planctomycetota", "Verrucomicrobiota", "Acidobacteriota",
-    "Spirochaetota", "Thermodesulfobacteriota", "Nitrospirota", "Gemmatimonadota",
-    "Deinococcota", "Armatimonadota", "Synergistota", "Fusobacteriota",
-    "Campylobacterota", "Aquificota", "Thermotogota", "Deferribacterota",
-    "Dictyoglomerota", "Elusimicrobiota", "Fibrobacterota",
+    "phaZ_Rpi":     "WKZ88401.1",     # Ralstonia pickettii
+    "phaZ_Rpi2":    "UCA14981.1",     # Ralstonia pickettii
+    "phaZ_Bsp":     "WP_128854079.1", # Bacillus sp. CDB3 — PMID: PMC1636284
 }
 
 
-def download_phaz_references(output_dir: Path, logger: logging.Logger) -> tuple:
-    """下载 PhaZ 参考序列并构建 BLAST + DIAMOND DB。"""
+def download_phaz_references(output_dir: Path, logger: logging.Logger):
+    """下载 PhaZ 参考序列并构建 DIAMOND DB。"""
     output_dir.mkdir(parents=True, exist_ok=True)
     fasta_path = output_dir / "phaz_references.fasta"
-    blast_db = output_dir / "phaz_db"
     diamond_db = output_dir / "phaz_db.dmnd"
 
-    if diamond_db.with_suffix(".dmnd").exists():
-        logger.info("BLAST + DIAMOND 数据库已存在")
-        return blast_db, str(diamond_db)
+    if diamond_db.exists():
+        logger.info("DIAMOND 数据库已存在，跳过下载")
+        return str(diamond_db)
 
     logger.info(f"下载 {len(PHAZ_REFERENCES)} 条 PhaZ 参考序列...")
     if not fasta_path.exists() or fasta_path.stat().st_size < 500:
@@ -110,30 +72,23 @@ def download_phaz_references(output_dir: Path, logger: logging.Logger) -> tuple:
     n = sum(1 for l in open(fasta_path) if l.startswith(">"))
     logger.info(f"下载完成: {n} 条 PhaZ 参考序列")
 
-    # BLAST DB
-    run_cmd(f"makeblastdb -in {fasta_path} -dbtype prot -out {blast_db}",
-            "makeblastdb", logger=logger)
-
     # DIAMOND DB
     run_cmd(f"diamond makedb --in {fasta_path} -d {diamond_db} --quiet",
             "diamond makedb", logger=logger)
+    return str(diamond_db)
 
-    return blast_db, str(diamond_db)
 
-
-def get_bacterial_genomes(logger: logging.Logger) -> List[Path]:
-    """获取细菌基因组列表，排除古菌。"""
+def get_archaeal_genomes(logger: logging.Logger) -> List[Path]:
+    """获取古菌基因组列表。"""
     logger.info("加载 GTDB 分类学...")
     taxonomy = load_gtdb_taxonomy()
 
-    phylum_map = {}
     domain_map = {}
     for _, row in tqdm(taxonomy.iterrows(), total=len(taxonomy), desc="解析分类"):
         gid = str(row.get("accession", "")).replace("RS_", "").replace("GB_", "")
         tax_str = str(row.get("taxonomy", ""))
         if gid and tax_str:
             tax = parse_gtdb_taxonomy(tax_str)
-            phylum_map[gid] = tax.get("phylum", "Unknown")
             domain_map[gid] = tax.get("domain", "Unknown")
 
     all_genomes = []
@@ -144,33 +99,28 @@ def get_bacterial_genomes(logger: logging.Logger) -> List[Path]:
 
     logger.info(f"基因组总数: {len(all_genomes)}")
 
-    bacterial = []
-    n_archaea = 0
+    archaea = []
+    n_bacteria = 0
     n_unknown = 0
-    n_other_phylum = 0
 
     for g in all_genomes:
         gid = g.name.replace("_genomic.fna.gz", "")
         domain = domain_map.get(gid, "Unknown")
-        phylum = phylum_map.get(gid, "")
 
         if domain == "Archaea":
-            n_archaea += 1; continue
-        elif domain != "Bacteria":
-            n_unknown += 1; continue
-        elif phylum and phylum not in BACTERIAL_PHYLA:
-            n_other_phylum += 1; continue
+            archaea.append(g)
+        elif domain == "Bacteria":
+            n_bacteria += 1
         else:
-            bacterial.append(g)
+            n_unknown += 1
 
-    logger.info(f"过滤: 排除古菌{n_archaea}, 非细菌{n_unknown}, 非目标门{n_other_phylum}")
-    logger.info(f"保留细菌基因组: {len(bacterial)}")
-    return sorted(bacterial)
+    logger.info(f"过滤: 古菌 {len(archaea)}, 细菌(跳过) {n_bacteria}, 未知 {n_unknown}")
+    return sorted(archaea)
 
 
-def process_genome_pyrodigal(args: Tuple[Path, str, Path, bool]) -> Dict:
-    """Pyrodigal (进程内) → DIAMOND blastp → 返回命中。"""
-    genome_path, diamond_db, tmp_base, use_diamond = args
+def process_genome_pyrodigal(args: Tuple[Path, str, Path]) -> Dict:
+    """Pyrodigal → DIAMOND blastp → 返回命中。"""
+    genome_path, diamond_db, tmp_base = args
     genome_id = genome_path.name.replace("_genomic.fna.gz", "")
 
     try:
@@ -178,51 +128,37 @@ def process_genome_pyrodigal(args: Tuple[Path, str, Path, bool]) -> Dict:
         tmp_dir.mkdir(parents=True, exist_ok=True)
 
         protein_file = tmp_dir / f"{genome_id}.faa"
-        dna_tmp = tmp_dir / f"{genome_id}.fna"
 
-        # Pyrodigal (进程内基因预测, 无 subprocess 开销)
+        # Pyrodigal 基因预测
         if not protein_file.exists() or protein_file.stat().st_size < 100:
-            # 解压基因组
             with gzip.open(genome_path, "rb") as fin:
                 dna_seq = fin.read()
 
-            # Pyrodigal 基因预测
             import pyrodigal
             orf_finder = pyrodigal.GeneFinder(meta=True)
             genes = orf_finder.find_genes(dna_seq)
 
-            # 写入蛋白文件 (迭代每个基因)
             with open(protein_file, "w") as f:
                 for i, gene in enumerate(genes):
                     seq = gene.sequence()
-                    if seq and len(seq) >= 30:  # 最少 30aa
+                    if seq and len(seq) >= 30:
                         f.write(f">{genome_id}_{i+1}\n{seq}\n")
 
-            del dna_seq  # 释放内存
+            del dna_seq
 
         if not protein_file.exists() or protein_file.stat().st_size < 100:
             shutil.rmtree(tmp_dir, ignore_errors=True)
             return {}
 
-        # 搜索 vs PhaZ DB
+        # DIAMOND 搜索
         result_file = tmp_dir / f"{genome_id}.hits.tsv"
-
-        if use_diamond:
-            run_cmd(
-                f"diamond blastp -q {protein_file} -d {diamond_db} "
-                f"-o {result_file} --outfmt 6 qseqid sseqid pident evalue "
-                f"-e 1e-10 --id 30 --query-cover 50 "
-                f"--threads 1 --quiet --max-target-seqs 5",
-                f"DIAMOND:{genome_id}", timeout=300, check=False
-            )
-        else:
-            blast_db = diamond_db  # fallback: use BLAST DB path
-            run_cmd(
-                f"blastp -query {protein_file} -db {blast_db} "
-                f"-out {result_file} -outfmt '6 qseqid sseqid pident evalue' "
-                f"-evalue 1e-10 -num_threads 1 -max_target_seqs 5",
-                f"BLASTP:{genome_id}", timeout=300, check=False
-            )
+        run_cmd(
+            f"diamond blastp -q {protein_file} -d {diamond_db} "
+            f"-o {result_file} --outfmt 6 qseqid sseqid pident evalue "
+            f"-e 1e-10 --id 30 --query-cover 50 "
+            f"--threads 1 --quiet --max-target-seqs 5",
+            f"DIAMOND:{genome_id}", timeout=300, check=False
+        )
 
         # 解析结果
         n_hits = 0
@@ -241,10 +177,8 @@ def process_genome_pyrodigal(args: Tuple[Path, str, Path, bool]) -> Dict:
                             if evalue <= 1e-10 and pident >= 30:
                                 n_hits += 1
                                 hit_refs.add(parts[1])
-                                if evalue < best_evalue:
-                                    best_evalue = evalue
-                                if pident > best_pident:
-                                    best_pident = pident
+                                best_evalue = min(best_evalue, evalue)
+                                best_pident = max(best_pident, pident)
                         except (ValueError, IndexError):
                             continue
 
@@ -253,6 +187,7 @@ def process_genome_pyrodigal(args: Tuple[Path, str, Path, bool]) -> Dict:
         if n_hits > 0:
             return {
                 "genome_id": genome_id,
+                "domain": "Archaea",
                 "phaZ_count": n_hits,
                 "best_evalue": best_evalue,
                 "best_pident": best_pident,
@@ -269,36 +204,37 @@ def process_genome_pyrodigal(args: Tuple[Path, str, Path, bool]) -> Dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="PhaZ 降解基因搜索 (Pyrodigal+DIAMOND)")
+    parser = argparse.ArgumentParser(description="古菌 PhaZ 降解基因搜索 (Pyrodigal+DIAMOND)")
     parser.add_argument("--threads", type=int, default=MAX_THREADS)
     parser.add_argument("--limit", type=int, default=0)
-    parser.add_argument("--no-diamond", action="store_true",
-                        help="使用 BLASTP 替代 DIAMOND")
     args = parser.parse_args()
 
-    logger = setup_logging(LOGS_DIR, "01_phb_search")
+    logger = setup_logging(LOGS_DIR, "01b_archaea_search")
 
-    use_diamond = not args.no_diamond
     logger.info("=" * 60)
-    logger.info("PhaZ 降解基因搜索 (Pyrodigal + %s)",
-                 "DIAMOND" if use_diamond else "BLASTP")
+    logger.info("古菌 PhaZ 降解基因搜索 (Pyrodigal + DIAMOND)")
+    logger.info("验证古菌中是否存在 phaZ 基因")
     logger.info("=" * 60)
 
     # Step 1: 参考序列 DB
-    blast_db, diamond_db = download_phaz_references(
-        EXTERNAL_DIR / "phb_references", logger)
-    search_db = diamond_db if use_diamond else str(blast_db)
+    diamond_db = download_phaz_references(EXTERNAL_DIR / "phb_references", logger)
 
-    # Step 2: 基因组列表
+    # Step 2: 古菌基因组列表
     logger.info("=" * 60)
-    logger.info("获取细菌基因组 (排除古菌)")
+    logger.info("获取古菌基因组")
     logger.info("=" * 60)
-    genomes = get_bacterial_genomes(logger)
+    archaea_genomes = get_archaeal_genomes(logger)
     if args.limit > 0:
-        genomes = genomes[:args.limit]
+        archaea_genomes = archaea_genomes[:args.limit]
+
+    logger.info(f"古菌基因组总数: {len(archaea_genomes)}")
+
+    if len(archaea_genomes) == 0:
+        logger.info("未找到古菌基因组，检查 GTDB 分类数据")
+        return
 
     # Step 3: 断点续传
-    result_file = PROCESSED_DIR / "phb_search_results.tsv"
+    result_file = PROCESSED_DIR / "archaea_phb_search_results.tsv"
     completed = set()
     if result_file.exists() and result_file.stat().st_size > 0:
         try:
@@ -308,18 +244,20 @@ def main():
         except Exception:
             pass
 
-    to_process = [g for g in genomes
+    to_process = [g for g in archaea_genomes
                   if g.name.replace("_genomic.fna.gz", "") not in completed]
     logger.info(f"已完成: {len(completed)}, 待处理: {len(to_process)}")
 
     if not to_process:
         logger.info("全部完成！")
-        # 统计
         if result_file.exists():
             df = pd.read_csv(result_file, sep="\t")
             n_genomes = len(df)
             n_phaz = int(df["phaZ_count"].sum())
-            logger.info(f"结果: {n_genomes} 个基因组含 PhaZ, 共 {n_phaz} 个 PhaZ 基因")
+            if n_phaz == 0:
+                logger.info("✓ 结论: 古菌中未发现 phaZ 基因 — 与预期一致")
+            else:
+                logger.warning(f"⚠ 古菌中发现 {n_phaz} 个 phaZ 基因 — 需进一步验证")
         return
 
     # Step 4: 并行搜索
@@ -327,16 +265,16 @@ def main():
     logger.info(f"并行搜索 ({args.threads} 线程, chunksize=1)")
     logger.info("=" * 60)
 
-    tmp_base = PROCESSED_DIR / "tmp"
+    tmp_base = PROCESSED_DIR / "tmp_archaea"
     tmp_base.mkdir(parents=True, exist_ok=True)
     batch = []
     batch_size = 500
 
     with Pool(args.threads) as pool:
-        tasks = [(g, search_db, tmp_base, use_diamond) for g in to_process]
+        tasks = [(g, diamond_db, tmp_base) for g in to_process]
         it = pool.imap_unordered(process_genome_pyrodigal, tasks, chunksize=1)
         for result in tqdm(it, total=len(to_process),
-                           desc="PhaZ search", ncols=100):
+                           desc="Archaea PhaZ search", ncols=100):
             if result:
                 batch.append(result)
 
@@ -352,25 +290,26 @@ def main():
         pd.DataFrame(batch).to_csv(result_file, sep="\t", mode="a",
                                    header=not result_file.exists(), index=False)
 
-    # 去重汇总
+    # 汇总
     if result_file.exists():
         df = pd.read_csv(result_file, sep="\t").drop_duplicates(subset="genome_id")
         df.to_csv(result_file, sep="\t", index=False)
         n_genomes = len(df)
         n_phaz = int(df["phaZ_count"].sum())
-        logger.info(f"最终结果: {n_genomes} 个基因组含 PhaZ, 共 {n_phaz} 个 PhaZ 基因")
 
-        # Top 10
-        if n_genomes > 0:
-            logger.info("Top 10 PhaZ 命中:")
-            for _, row in df.nlargest(10, "phaZ_count").iterrows():
-                extras = ""
-                if "best_pident" in row:
-                    extras = f" (best: {row['best_pident']:.1f}%)"
-                logger.info(f"  {row['genome_id']}: {int(row['phaZ_count'])} PhaZ{extras}")
+        logger.info("=" * 60)
+        logger.info(f"最终结果: 古菌中 {n_genomes} 个基因组含 PhaZ 同源序列, 共 {n_phaz} 个")
+        if n_phaz == 0:
+            logger.info("✓ 结论: 所有古菌基因组中未发现 phaZ 基因")
+            logger.info("  与前期研究结论一致 — 古菌不携带 PHB depolymerase")
+        else:
+            logger.warning("⚠ 发现潜在 phaZ 同源序列 — 建议人工核查")
+            for _, row in df.head(20).iterrows():
+                logger.info(f"  {row['genome_id']}: {int(row['phaZ_count'])} hit(s), "
+                          f"best_pident={row['best_pident']:.1f}%")
 
     logger.info("=" * 60)
-    logger.info("完成！")
+    logger.info("古菌搜索完成！")
     logger.info("=" * 60)
 
 
