@@ -297,6 +297,12 @@ def main():
         pd.DataFrame(batch).to_csv(result_file, sep="\t", mode="a",
                                    header=not result_file.exists(), index=False)
 
+    # 即使零命中也创建结果文件
+    if not result_file.exists():
+        pd.DataFrame(columns=["genome_id", "domain", "phaZ_count",
+                             "best_evalue", "best_pident", "hit_refs"]).to_csv(
+            result_file, sep="\t", index=False)
+
     # 汇总
     if result_file.exists():
         df = pd.read_csv(result_file, sep="\t").drop_duplicates(subset="genome_id")

@@ -335,8 +335,10 @@ def main():
     with Pool(args.threads) as pool:
         tasks = [(g, search_db, tmp_base, use_diamond) for g in to_process]
         it = pool.imap_unordered(process_genome_pyrodigal, tasks, chunksize=1)
+        processed = 0
         for result in tqdm(it, total=len(to_process),
                            desc="PhaZ search", ncols=100):
+            processed += 1
             if result:
                 batch.append(result)
 
@@ -344,13 +346,26 @@ def main():
                 new_df = pd.DataFrame(batch)
                 new_df.to_csv(result_file, sep="\t", mode="a",
                              header=not result_file.exists(), index=False)
-                logger.info(f"保存 {len(batch)} 条结果 (累计已完成)")
+                logger.info(f"保存 {len(batch)} 条结果 "
+                          f"(已处理 {processed}/{len(to_process)} 基因组)")
                 batch = []
+
+            # 每 5000 基因组输出进度
+            if processed % 5000 == 0:
+                logger.info(f"进度: {processed}/{len(to_process)} "
+                          f"({100*processed/len(to_process):.1f}%), "
+                          f"累计命中: {len(batch) + (int(pd.read_csv(result_file, sep='\t')['phaZ_count'].sum()) if result_file.exists() else 0)} PhaZ")
 
     # 保存剩余
     if batch:
         pd.DataFrame(batch).to_csv(result_file, sep="\t", mode="a",
                                    header=not result_file.exists(), index=False)
+
+    # 即使零命中也创建结果文件
+    if not result_file.exists():
+        pd.DataFrame(columns=["genome_id", "phaZ_count", "best_evalue",
+                             "best_pident", "hit_refs"]).to_csv(
+            result_file, sep="\t", index=False)
 
     # 去重汇总
     if result_file.exists():
