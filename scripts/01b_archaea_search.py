@@ -147,7 +147,7 @@ def process_genome_pyrodigal(args: Tuple[Path, str, Path]) -> Dict:
 
             with open(protein_file, "w") as f:
                 for i, gene in enumerate(genes):
-                    seq = gene.sequence()
+                    seq = gene.translate()
                     if seq and len(seq) >= 30:
                         f.write(f">{genome_id}_{i+1}\n{seq}\n")
 
