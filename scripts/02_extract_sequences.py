@@ -22,6 +22,7 @@ from multiprocessing import Pool
 from typing import List, Dict, Tuple
 
 import pandas as pd
+import pyrodigal
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from tqdm import tqdm
@@ -35,7 +36,7 @@ from utils import (setup_logging, run_cmd, write_fasta, read_fasta,
 def find_genome_path(genome_id: str) -> Path:
     """根据 GTDB accession 定位基因组文件。"""
     parts = genome_id.split("_")
-    if len(parts) < 3:
+    if len(parts) < 2:
         return None
     prefix = parts[1]  # e.g. 000952205.1
     subdir = f"{prefix[0:3]}/{prefix[3:6]}/{prefix[6:9]}"
@@ -66,7 +67,6 @@ def process_one_genome(args: Tuple[str, str, Path]) -> Dict:
             with gzip.open(genome_path, "rb") as f:
                 dna_seq = f.read()
 
-            import pyrodigal
             gf = pyrodigal.GeneFinder(meta=True)
             genes = gf.find_genes(dna_seq)
 
@@ -124,6 +124,8 @@ def process_one_genome(args: Tuple[str, str, Path]) -> Dict:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
     except Exception as e:
+        sys.stderr.write(f"[ERROR] {genome_id}: {e}\n")
+        sys.stderr.flush()
         try:
             shutil.rmtree(tmp_base / genome_id, ignore_errors=True)
         except:
