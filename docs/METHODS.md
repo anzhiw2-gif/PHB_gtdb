@@ -242,17 +242,22 @@ Lipase box (G-X-S-X-G) 是胞外型 PhaZ 催化活性位点的标志性基序，
 
 **trimAl**: 自动识别并移除比对中的 gap-rich 区域（`-gappyout` 模式），这些区域通常是比对噪声或不保守的 loop 区域，移除后提高系统发育信号。
 
-**IQ-TREE**: 最大似然法建树，使用 ModelFinder Plus (`-m MFP`) 自动选择最优氨基酸替代模型，标准 bootstrap 1,000 次 (`-B 1000`)，同时输出 SH-aLRT 分支支持度。
+**IQ-TREE**: 最大似然法建树，分两种策略：
+
+- **小组 (57-509 序列)**: ModelFinder Plus (`-m MFP`) 自动选模型 + 标准 bootstrap 1,000 次 (`-B 1000`)，同时输出 SH-aLRT
+- **大组 (2,776-4,424 序列)**: 直接使用 LG+F+G4 替代模型（跳过 ModelFinder），`-T AUTO` 自动线程，**不做 bootstrap**（仅 ML 树拓扑）
+
+**策略选择理由**: ModelFinder 对大组需测试 400+ 个候选模型（实测曾运行 25h 未完成），LG 是最通用的蛋白替代矩阵 (Le & Gascuel, 2008)，广泛用于深度系统发育分析。Bootstrap 对 2,000+ 序列计算量过大，论文中仅需 ML 拓扑即可。
 
 #### 各亚型建树参数
 
-| 亚型 | 修剪后序列 | 线程 | Bootstrap |
-|---|---|---|---|
-| bacillus_type | 57 | 8 | 1,000 |
-| extracellular_lemoignei | 412 | 10 | 1,000 |
-| extracellular | 509 | 10 | 1,000 |
-| ralstonia | 2,776 | 30 | 1,000 |
-| intracellular | 4,424 | 30 | 1,000 |
+| 亚型 | 序列 | 模型选择 | Bootstrap | 线程 | 状态 |
+|---|---|---|---|---|---|
+| bacillus_type | 57 | MFP | B1000 | 4 | ✅ |
+| extracellular_lemoignei | 412 | MFP | B1000 | 10 | ✅ |
+| extracellular | 509 | MFP | B1000 | 10 | ✅ |
+| ralstonia | 2,776 | LG+F+G4 | — | AUTO | 🔄 |
+| intracellular | 4,424 | LG+F+G4 | — | AUTO | ⏳ |
 
 ---
 
