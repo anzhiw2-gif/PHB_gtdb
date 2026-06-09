@@ -82,9 +82,10 @@ def process_one_genome(args: Tuple[str, str, Path]) -> Dict:
             return result
 
         # DIAMOND
+        diamond_bin = str(CONDA_BIN / "diamond")
         result_file = tmp_dir / f"{genome_id}.hits.tsv"
         run_cmd(
-            f"diamond blastp -q {protein_file} -d {diamond_db} "
+            f"{diamond_bin} blastp -q {protein_file} -d {diamond_db} "
             f"-o {result_file} --outfmt 6 qseqid sseqid pident evalue "
             f"-e 1e-10 --id 30 --query-cover 50 "
             f"--threads 1 --quiet --max-target-seqs 5 --ignore-warnings",
@@ -109,7 +110,7 @@ def process_one_genome(args: Tuple[str, str, Path]) -> Dict:
             # 提取序列
             proteins = {}
             for rec in SeqIO.parse(protein_file, "fasta"):
-                proteins[rec.id] = str(rec.seq)
+                proteins[rec.id] = rec.seq
 
             for pid in hit_ids:
                 if pid in proteins:
