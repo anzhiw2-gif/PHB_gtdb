@@ -32,34 +32,27 @@
 
 ```
 PHB_gtdb/
-├── main_pipeline.sh                 # 一键运行完整流程
-├── monitor_search.sh                # 实时搜索监控 (自动检测模式)
-├── monitor.sh                       # 通用分析监控
-├── download_monitor.sh              # 下载进度监控
-├── extract_monitor.sh               # 解压进度监控
 ├── README.md
-├── requirements.txt
-├── .gitignore
 ├── docs/
-│   └── PHAZ_REFERENCES.md           # PhaZ 参考序列完整文档
+│   ├── PIPELINE.md                   # 完整分析管线文档 ← 从这里开始
+│   ├── PHAZ_REFERENCES.md            # PhaZ 参考序列 (14条, NCBI验证)
+│   └── SEARCH_REPORT.md              # 搜索结果报告
 ├── scripts/
-│   ├── config.py                    # 全局配置
-│   ├── utils.py                     # 工具函数
-│   ├── 01_phb_search.py             # Step 1: 细菌 PhaZ 搜索 (Pyrodigal+DIAMOND)
-│   ├── 01b_archaea_search.py        # Step 1b: 古菌 PhaZ 搜索 (验证假说)
-│   ├── 02_extract_sequences.py      # Step 2: 序列提取
-│   ├── 03_msa.py                    # Step 3: 多序列比对
-│   ├── 04_phylogeny.py              # Step 4: 系统发育分析
+│   ├── config.py                     # 全局配置
+│   ├── utils.py                      # 工具函数
+│   ├── 01_phb_search.py              # Step 1: 细菌 PhaZ 搜索
+│   ├── 01b_archaea_search.py         # Step 1b: 古菌 PhaZ 搜索
+│   ├── 02_extract_sequences.py       # Step 2: 提取 PhaZ 蛋白序列
+│   ├── 03_msa.py                     # Step 3: 分型 + MAFFT + trimAl
+│   ├── 04_phylogeny.py              # Step 4: IQ-TREE 建树
 │   ├── 05_annotation.py             # Step 5: 功能注释
 │   └── 06_visualization.py          # Step 6: 可视化
-├── data/
-│   ├── external/phb_references/      # PhaZ 参考序列 + DIAMOND DB
-│   └── processed/                   # 中间结果
-├── results/
-│   ├── figures/                     # 论文图表 (PDF)
-│   ├── tables/                      # 统计表格 (TSV)
-│   └── logs/                        # 运行日志
-└── notebooks/                       # Jupyter Notebooks
+├── data/processed/                   # 中间结果
+├── results/                          # 输出 (树文件等)
+├── monitor_search.sh                 # 实时搜索监控
+├── monitor.sh                        # 通用分析监控
+├── download_monitor.sh               # 下载进度监控
+└── extract_monitor.sh                # 解压进度监控
 ```
 
 ## 快速开始
