@@ -188,7 +188,10 @@ HMMer 使用隐马尔可夫模型 (profile HMM) 进行序列搜索。相比 DIAM
 
 #### 验证结果
 - HMMer 确认率: **80.7%** (6,033/7,478)
-- 合并验证集 (HMMer + DIAMOND): **6,532 条** (87.3%)
+- DIAMOND 高置信度: **3,270** (pident≥35% + ≥150aa)
+- 合并验证集 (HMMer ∪ DIAMOND): **6,532 条** (HMMer 3,262 + 双重 2,771 + DIAM 499)
+
+> HMMer (14条参考构建的 profile HMM) 保精确度, DIAMOND (pident 过滤) 保召回率。499 条序列仅通过 DIAMOND 验证 — 多为远缘同源物 (identity 30-35%), profile HMM 对其不敏感但序列完整且 DIAMOND 置信度达标。
 
 ---
 
