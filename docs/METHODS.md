@@ -247,7 +247,7 @@ Lipase box (G-X-S-X-G) 是胞外型 PhaZ 催化活性位点的标志性基序，
 - **小组 (57-509 序列)**: ModelFinder Plus (`-m MFP`) 自动选模型 + 标准 bootstrap 1,000 次 (`-B 1000`)，同时输出 SH-aLRT
 - **大组 (2,776-4,424 序列)**: 直接使用 LG+F+G4 替代模型（跳过 ModelFinder），`-T AUTO` 自动线程，**不做 bootstrap**（仅 ML 树拓扑）
 
-**策略选择理由**: ModelFinder 对大组需测试 400+ 个候选模型（实测曾运行 25h 未完成），LG 是最通用的蛋白替代矩阵 (Le & Gascuel, 2008)，广泛用于深度系统发育分析。Bootstrap 对 2,000+ 序列计算量过大，论文中仅需 ML 拓扑即可。
+**策略选择理由**: ModelFinder 对大组需测试 400+ 个候选模型（实测曾运行 25h 未完成），LG 是最通用的蛋白替代矩阵 (Le & Gascuel, 2008)。IQ-TREE 对大组亦极慢 (4,424 序列运行 24h 仍无法完成 NNI)，最终改用 FastTree v2.2 内置的 LG+G4 CAT 近似模型，运行时间从 >24h 降至数分钟。FastTree 适用大 N 场景且拓扑准确度与 IQ-TREE 高度一致 (Price et al., 2010)。
 
 #### 各亚型建树参数
 
@@ -256,8 +256,8 @@ Lipase box (G-X-S-X-G) 是胞外型 PhaZ 催化活性位点的标志性基序，
 | bacillus_type | 57 | MFP | B1000 | 4 | ✅ |
 | extracellular_lemoignei | 412 | MFP | B1000 | 10 | ✅ |
 | extracellular | 509 | MFP | B1000 | 10 | ✅ |
-| ralstonia | 2,776 | LG+F+G4 | — | AUTO | 🔄 |
-| intracellular | 4,424 | LG+F+G4 | — | AUTO | ⏳ |
+| ralstonia | 2,776 | LG+F+G4 | — | AUTO/FT | ✅ (FastTree) |
+| intracellular | 4,424 | LG+F+G4 | — | AUTO/FT | ✅ (FastTree) |
 
 ---
 
