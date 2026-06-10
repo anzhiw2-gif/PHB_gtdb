@@ -105,6 +105,7 @@ PHB_gtdb/
 │   ├── METHODS.md                    # 方法与结果详细报告 (论文用)
 │   ├── PHAZ_REFERENCES.md            # PhaZ 参考序列 (14条, NCBI验证)
 │   ├── RESULTS.md                    # 最终统计结果 (门矩阵, 亚型, Top属)
+│   ├── FINAL_REPORT.md                # 最终综合报告
 │   ├── SEARCH_REPORT.md              # 搜索结果报告
 │   └── REVIEW.md                     # 管线评审与改进计划
 ├── scripts/
