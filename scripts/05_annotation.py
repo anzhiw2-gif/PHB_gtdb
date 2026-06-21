@@ -192,7 +192,7 @@ def phylum_level_summary(phb_counts: Path, taxonomy_df: pd.DataFrame,
                          output_path: Path) -> pd.DataFrame:
     """按门水平汇总 PHB 基因分布。"""
     df = pd.read_csv(phb_counts, sep="\t")
-    gene_cols = [c for c in df.columns if c != "genome_id"]
+    gene_cols = [c for c in df.columns if c.endswith("_count")]
 
     # 添加分类学
     taxonomy_df["genome_id"] = taxonomy_df["accession"].apply(
@@ -235,10 +235,16 @@ def main():
     logger = setup_logging(LOGS_DIR, "05_annotation")
 
     # 输入: PHB 蛋白序列 (去冗余后)
-    input_fasta = PROCESSED_DIR / "phb_proteins_dedup.fasta"
-    if not input_fasta.exists():
-        input_fasta = PROCESSED_DIR / "phb_proteins_annotated.fasta"
-    if not input_fasta.exists():
+    input_candidates = [
+        PROCESSED_DIR / "phaz_proteins_validated.fasta",
+        PROCESSED_DIR / "phaz_proteins_filtered.fasta",
+        PROCESSED_DIR / "phaz_proteins_c95.fasta",
+        PROCESSED_DIR / "phaz_proteins_all.fasta",
+        PROCESSED_DIR / "phb_proteins_dedup.fasta",
+        PROCESSED_DIR / "phb_proteins_annotated.fasta",
+    ]
+    input_fasta = next((p for p in input_candidates if p.exists() and p.stat().st_size > 0), None)
+    if input_fasta is None:
         logger.error("PHB 蛋白序列不存在，请先运行 02_extract_sequences.py")
         sys.exit(1)
 

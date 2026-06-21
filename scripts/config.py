@@ -3,13 +3,13 @@ PHB_gtdb — 全局配置文件
 所有路径、参数集中管理，便于复现分析
 """
 
-import os
 from pathlib import Path
+import os
 
 # ==============================================================================
 # 项目路径
 # ==============================================================================
-PROJECT_ROOT = Path("/home/data/haoyu/PHB_gtdb")
+PROJECT_ROOT = Path(os.environ.get("PHB_PROJECT_ROOT", Path(__file__).resolve().parents[1]))
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
@@ -21,7 +21,7 @@ LOGS_DIR = RESULTS_DIR / "logs"
 SCRIPTS_DIR = PROJECT_ROOT / "scripts"
 
 # GTDB 数据库路径 (R232, 服务器 10.16.1.141)
-GTDB_ROOT = Path("/home/data/haoyu/GTDB")
+GTDB_ROOT = Path(os.environ.get("GTDB_ROOT", "/home/data/haoyu/GTDB"))
 GTDB_GENOMES = GTDB_ROOT / "gtdb_genomes_reps_r232" / "database"
 GTDB_METADATA = GTDB_ROOT / "metadata" / "bac120_metadata_r232.tsv"
 GTDB_TAXONOMY = GTDB_ROOT / "taxonomy" / "bac120_taxonomy_r232.tsv"
@@ -29,8 +29,8 @@ GTDB_TAXONOMY_AR53 = GTDB_ROOT / "taxonomy" / "ar53_taxonomy_r232.tsv"
 GTDB_TREE = GTDB_ROOT / "GTDB_tree" / "bac120_r232.tree"
 
 # Conda 环境路径 (无需 sudo)
-CONDA_ENV = Path("/home/data/haoyu/miniconda3/envs/phb_gtdb")
-CONDA_BIN = Path("/home/data/haoyu/miniconda3/bin")
+CONDA_ENV = Path(os.environ.get("PHB_CONDA_ENV", "/home/data/haoyu/miniconda3/envs/phb_gtdb"))
+CONDA_BIN = Path(os.environ.get("CONDA_BIN", "/home/data/haoyu/miniconda3/bin"))
 
 # ==============================================================================
 # PHB 相关基因配置
