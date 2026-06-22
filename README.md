@@ -137,6 +137,15 @@ nohup python scripts/08_grodon_growth.py \
   > results/logs/grodon_growth_hmm_allmatched.out 2>&1 &
 ```
 
+实时可视化监控：
+
+```bash
+python scripts/09_monitor_grodon_progress.py \
+  --interval 60 \
+  --history results/tables/grodon_growth_monitor_history.tsv \
+  --plot results/figures/grodon_growth_progress.png
+```
+
 详细步骤、每个脚本的输入输出和原理见：
 
 - [docs/REPRODUCIBLE_WORKFLOW.md](docs/REPRODUCIBLE_WORKFLOW.md)

@@ -88,6 +88,7 @@ Key files:
 | `scripts/08_prepare_ribosomal_hmms.py` | Build a reproducible Pfam ribosomal protein HMM subset |
 | `scripts/08_grodon_growth.py` | Build matched manifest, predict CDS/HEG, call gRodon2, summarize same-genus differences |
 | `scripts/08_run_grodon_one.R` | Single-genome `gRodon::predictGrowth` wrapper |
+| `scripts/09_monitor_grodon_progress.py` | Live terminal/PNG monitor for the all-matched gRodon2 run |
 | `docs/GROWTH_RATE_ANALYSIS.md` | Design, pilot results, commands, and interpretation boundaries |
 
 Pilot status:
@@ -116,4 +117,13 @@ python scripts/08_grodon_growth.py \
   --max-per-genus 0 \
   --resume \
   --output-label hmm_allmatched
+```
+
+Live monitor:
+
+```bash
+python scripts/09_monitor_grodon_progress.py \
+  --interval 60 \
+  --history results/tables/grodon_growth_monitor_history.tsv \
+  --plot results/figures/grodon_growth_progress.png
 ```

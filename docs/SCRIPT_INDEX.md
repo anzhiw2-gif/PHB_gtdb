@@ -29,6 +29,7 @@
 | `08_prepare_ribosomal_hmms.py` | gRodon formal | 准备 Pfam 核糖体蛋白 HMM 小库 | 下载 Pfam metadata 和 HMM，筛选原核核糖体蛋白模型，抽取小型 HMM 库 | `data/external/grodon/ribosomal_pfam.hmm` |
 | `08_run_grodon_one.R` | gRodon formal | 对单个基因组运行 gRodon2 | 读取 CDS 和 HEG ID，调用 `gRodon::predictGrowth` | 标准输出中的 `RESULT` 行 |
 | `08_grodon_growth.py` | gRodon formal | 同属内 `phaZ+` vs `phaZ-` 最大生长速率预测 | Pyrodigal 预测 CDS，HMMER 标记核糖体 HEG，gRodon2 预测 doubling time，再按属汇总 | `results/tables/grodon_growth_*` |
+| `09_monitor_grodon_progress.py` | gRodon monitor | 实时监控 gRodon2 后台任务 | 读取 manifest、prediction table 和 nohup log，计算进度、速度、ETA，并可输出 PNG 进度图 | 终端 dashboard, optional history TSV/PNG |
 | `check_results.py` | QC | 检查关键结果是否齐全 | 按预期序列数、表格行数、tree 和 figure 文件存在性进行校验 | 终端 QC 报告 |
 
 ## Step 1: PhaZ 候选搜索

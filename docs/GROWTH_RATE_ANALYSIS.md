@@ -126,6 +126,17 @@ tail -40 results/logs/grodon_growth_hmm_allmatched.out
 wc -l results/tables/grodon_growth_predictions_hmm_allmatched.tsv
 ```
 
+实时可视化监控：
+
+```bash
+python scripts/09_monitor_grodon_progress.py \
+  --interval 60 \
+  --history results/tables/grodon_growth_monitor_history.tsv \
+  --plot results/figures/grodon_growth_progress.png
+```
+
+该脚本会显示终端进度条、完成比例、`ok/failed/pending` 数量、最近日志、处理速度和预计完成时间。`--plot` 会持续刷新一张 PNG 进度图，`--history` 会保存每次刷新记录，便于之后追踪运行速度变化。
+
 ## 后续统计建议
 
 正式结果完成后建议进行：
