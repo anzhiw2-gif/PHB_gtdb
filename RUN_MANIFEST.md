@@ -47,3 +47,73 @@ The checker verifies FASTA counts, search TSV counts, tree files, and figure fil
 - The server runtime directory may not itself be a git repository. Keep this manifest together with the scripts used to generate results.
 - `phaz_proteins_c95.fasta` is the canonical c95 deduplicated file. Avoid using the ambiguous `phaz_proteins_dedup.fasta` name for final reporting.
 - Historical failed logs may exist in `results/logs/`; use the latest successful logs and `scripts/check_results.py` for final validation.
+
+## Tracked Figure Archive
+
+The repository tracks the lightweight source data and final Nature-style figures:
+
+| Directory | Purpose |
+|---|---|
+| `figure_data/` | Lightweight source data used by `scripts/07_nature_figures.py` |
+| `figures/nature/` | Final Figure 1-4 outputs in PDF, PNG, and SVG |
+| `figures/nature/source_data/` | Source data copied with the generated figures |
+
+Expected figure files:
+
+```text
+figure1_workflow_funnel.pdf/png/svg
+figure2_phylum_heatmap.pdf/png/svg
+figure3_subtype_lipase.pdf/png/svg
+figure4_genera_phylogeny.pdf/png/svg
+```
+
+Figure titles and captions are maintained in `docs/FIGURE_CAPTIONS.md`.
+
+## gRodon2 Growth-Rate Extension
+
+Expert-suggested extension:
+
+```text
+Pyrodigal CDS/protein prediction
+  -> Pfam ribosomal protein HMM + HMMER
+  -> ribosomal proteins as highly expressed genes
+  -> gRodon2 predictGrowth
+  -> same-genus phaZ+ vs phaZ- comparison
+```
+
+Key files:
+
+| File | Purpose |
+|---|---|
+| `scripts/08_prepare_ribosomal_hmms.py` | Build a reproducible Pfam ribosomal protein HMM subset |
+| `scripts/08_grodon_growth.py` | Build matched manifest, predict CDS/HEG, call gRodon2, summarize same-genus differences |
+| `scripts/08_run_grodon_one.R` | Single-genome `gRodon::predictGrowth` wrapper |
+| `docs/GROWTH_RATE_ANALYSIS.md` | Design, pilot results, commands, and interpretation boundaries |
+
+Pilot status:
+
+```text
+Strict Pfam HMM pilot: 12/12 genomes succeeded
+n_highly_expressed: 35-45
+```
+
+Formal all-matched manifest:
+
+```text
+8,788 genomes
+4,394 phaZ+
+4,394 same-genus phaZ-
+903 genera
+```
+
+Current formal run on T141:
+
+```bash
+python scripts/08_grodon_growth.py \
+  --heg-method hmm \
+  --threads 8 \
+  --marker-threads 1 \
+  --max-per-genus 0 \
+  --resume \
+  --output-label hmm_allmatched
+```

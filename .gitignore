@@ -1,9 +1,9 @@
-# 数据文件 (过大)
+# Large input and generated analysis data
 data/raw/
 data/processed/
 data/external/
 
-# 结果文件 (可重新生成)
+# Reproducible result tables and logs generated on the server
 results/figures/
 results/tables/
 results/logs/
@@ -23,24 +23,26 @@ __pycache__/
 .vscode/
 .idea/
 
-# Conda
+# Conda / local environments
 env/
+.venv/
 
-# 大文件
+# Large archives and compressed genomes
 *.tar.gz
 *.zip
 *.fna.gz
 *.faa.gz
 
-# 系统
-.DS_Store
-Thumbs.db
-
-# 敏感配置文件 (含服务器IP、密钥路径)
-config/
-server/
-
-# 临时文件
+# Local plotting cache and temporary files
+.mplconfig/
 tmp/
 temp/
 *.tmp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Sensitive or machine-specific configuration
+config/
+server/
