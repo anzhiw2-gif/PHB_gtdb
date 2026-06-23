@@ -179,3 +179,10 @@ python scripts/09_monitor_grodon_progress.py \
 - `results/tables/` 和 `results/logs/` 默认不上传，因为服务器可重新生成，且可能持续更新。
 - `figures/nature/` 和 `figure_data/` 已纳入仓库，用于汇报和论文图复现。
 - 所有关键运行参数、服务器路径和预期结果数量记录在 [RUN_MANIFEST.md](RUN_MANIFEST.md)。
+
+## Latest gRodon2 Growth-Rate Result
+
+The genus-balanced gRodon2 analysis is complete. The final balanced comparison includes 8,692 genomes, with 4,346 `phaZ+` and 4,346 `phaZ-` genomes across 899 genera. Genus-level tests did not detect a significant global growth-rate difference between `phaZ+` and `phaZ-` genomes.
+
+- Figure: [figure5_grodon_growth_comparison_hmm_allmatched.pdf](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.pdf)
+- Detailed statistics: [docs/GRODON2_FINAL_STATS.md](docs/GRODON2_FINAL_STATS.md)

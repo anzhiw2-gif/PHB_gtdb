@@ -1,0 +1,27 @@
+metric	value	interval	note
+n_grodon2_input_genomes	8788.0		
+n_balanced_genomes	8692.0		
+n_balanced_phaZ_positive	4346.0		
+n_balanced_phaZ_negative	4346.0		
+n_balanced_genera	899.0		
+n_failed_genomes	53.0		
+n_failed_genera	37.0		
+n_status_ok_but_missing_growth_rate	3.0		
+n_successful_excluded_by_balance	40.0		
+genus_mean_delta_growth_rate_per_h	-0.0027343961570460615	-0.01550934153903655,0.00931965978880773	bootstrap_95_ci
+genus_median_delta_growth_rate_per_h	0.0018126543047364	-0.0023330112458085,0.0056519218566836	bootstrap_95_ci
+genus_weighted_mean_delta_growth_rate_per_h	0.008232559579060593	-0.0035908803908168917,0.01979006959631724	bootstrap_95_ci_weighted_by_selected_pairs
+n_genera_delta_positive	463.0		
+n_genera_delta_negative	436.0		
+exact_sign_test_two_sided_p	0.3858716142726256		genus_delta_signs
+wilcoxon_signed_rank_z	0.7407803906966746		normal_approximation
+wilcoxon_signed_rank_two_sided_p	0.45882660672985853		normal_approximation
+wilcoxon_effect_r	0.024706409287663874		z/sqrt(n_genera)
+stratified_permutation_unweighted_mean_delta	-0.0027343961570460594		5000_within_genus_permutations
+stratified_permutation_unweighted_p	0.6696660667866426		5000_within_genus_permutations
+stratified_permutation_weighted_mean_delta	0.008232559579060602		5000_within_genus_permutations
+stratified_permutation_weighted_p	0.23095380923815237		5000_within_genus_permutations
+genome_level_mean_growth_phaZ_positive	0.3917417656718686		descriptive_only_not_independent
+genome_level_mean_growth_phaZ_negative	0.383509206092808		descriptive_only_not_independent
+genome_level_median_growth_phaZ_positive	0.23996194691431477		descriptive_only_not_independent
+genome_level_median_growth_phaZ_negative	0.2317600115809229		descriptive_only_not_independent
