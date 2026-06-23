@@ -27,7 +27,7 @@ GTDB release: R232
 | 古菌结果 | 初始 2 个短片段命中，最终 0 条高置信度 PhaZ |
 | 主导类群 | Pseudomonadota 占主导 |
 | 主导亚型 | 胞内型 PhaZ 为主 |
-| 生长速率扩展分析 | gRodon2 同属 `phaZ+` vs `phaZ-` 正在 T141 后台运行 |
+| 生长速率扩展分析 | 已完成 gRodon2 同属平衡比较：4,346 个 `phaZ+` 与 4,346 个 `phaZ-` 基因组，覆盖 899 个属；未检测到显著全局差异 |
 
 核心解释：PhaZ 不是单一高度保守蛋白，而是 alpha/beta hydrolase 相关的功能多样酶家族。因此本项目采用“先高置信度筛选，再按亚型独立分析”的路线，避免把胞外、胞内和新型 PhaZ 混在一棵树中造成错误解释。
 
@@ -89,6 +89,9 @@ PHB_gtdb/
     07_nature_figures.py
     08_prepare_ribosomal_hmms.py
     08_grodon_growth.py
+    09_monitor_grodon_progress.py
+    10_balance_grodon_by_genus.py
+    11_grodon_growth_stats.py
   docs/
     PRESENTATION_SUMMARY.md
     REPRODUCIBLE_WORKFLOW.md
@@ -101,6 +104,7 @@ PHB_gtdb/
     figure2_phylum_heatmap.pdf/png/svg
     figure3_subtype_lipase.pdf/png/svg
     figure4_genera_phylogeny.pdf/png/svg
+    figure5_grodon_growth_comparison_hmm_allmatched.pdf/png/svg
   figure_data/
     作图所需的轻量源数据
 ```
@@ -121,29 +125,19 @@ python scripts/check_results.py
 python scripts/07_nature_figures.py
 ```
 
-gRodon2 生长速率分析：
+gRodon2 生长速率扩展分析已经完成。README 只保留复现入口，详细参数和结果解释见 [docs/GRODON2_FINAL_STATS.md](docs/GRODON2_FINAL_STATS.md)。
 
 ```bash
-Rscript scripts/install_grodon2.R /home/data/haoyu/software/gRodon2
 python scripts/08_prepare_ribosomal_hmms.py
-
-nohup python scripts/08_grodon_growth.py \
-  --heg-method hmm \
-  --threads 8 \
-  --marker-threads 1 \
-  --max-per-genus 0 \
-  --resume \
-  --output-label hmm_allmatched \
-  > results/logs/grodon_growth_hmm_allmatched.out 2>&1 &
+python scripts/08_grodon_growth.py --heg-method hmm --output-label hmm_allmatched
+python scripts/10_balance_grodon_by_genus.py --label hmm_allmatched
+python scripts/11_grodon_growth_stats.py --label hmm_allmatched
 ```
 
-实时可视化监控：
+长任务运行时可用监控脚本查看进度：
 
 ```bash
-python scripts/09_monitor_grodon_progress.py \
-  --interval 60 \
-  --history results/tables/grodon_growth_monitor_history.tsv \
-  --plot results/figures/grodon_growth_progress.png
+python scripts/09_monitor_grodon_progress.py --once --no-clear
 ```
 
 详细步骤、每个脚本的输入输出和原理见：
@@ -161,6 +155,7 @@ python scripts/09_monitor_grodon_progress.py \
 | Figure 2 | [figure2_phylum_heatmap.pdf](figures/nature/figure2_phylum_heatmap.pdf) | 门水平 PhaZ 分布与亚型热图 |
 | Figure 3 | [figure3_subtype_lipase.pdf](figures/nature/figure3_subtype_lipase.pdf) | 五类 PhaZ 亚型组成与 lipase box 验证 |
 | Figure 4 | [figure4_genera_phylogeny.pdf](figures/nature/figure4_genera_phylogeny.pdf) | Top 属分布与系统发育树概览 |
+| Figure 5 | [figure5_grodon_growth_comparison_hmm_allmatched.pdf](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.pdf) | 同属平衡 `phaZ+` 与 `phaZ-` 预测最大生长速率比较 |
 
 图题与图注见 [docs/FIGURE_CAPTIONS.md](docs/FIGURE_CAPTIONS.md)。
 
@@ -171,6 +166,7 @@ python scripts/09_monitor_grodon_progress.py \
 - [docs/METHODS.md](docs/METHODS.md): 方法细节
 - [docs/PIPELINE.md](docs/PIPELINE.md): 原始分析流程说明
 - [docs/PHAZ_REFERENCES.md](docs/PHAZ_REFERENCES.md): 14 条 PhaZ 参考序列
+- [docs/GRODON2_FINAL_STATS.md](docs/GRODON2_FINAL_STATS.md): gRodon2 同属平衡统计检验与 Figure 5 说明
 - [docs/REVIEW.md](docs/REVIEW.md): 项目检查与改进建议
 
 ## 数据追踪原则
@@ -179,10 +175,3 @@ python scripts/09_monitor_grodon_progress.py \
 - `results/tables/` 和 `results/logs/` 默认不上传，因为服务器可重新生成，且可能持续更新。
 - `figures/nature/` 和 `figure_data/` 已纳入仓库，用于汇报和论文图复现。
 - 所有关键运行参数、服务器路径和预期结果数量记录在 [RUN_MANIFEST.md](RUN_MANIFEST.md)。
-
-## Latest gRodon2 Growth-Rate Result
-
-The genus-balanced gRodon2 analysis is complete. The final balanced comparison includes 8,692 genomes, with 4,346 `phaZ+` and 4,346 `phaZ-` genomes across 899 genera. Genus-level tests did not detect a significant global growth-rate difference between `phaZ+` and `phaZ-` genomes.
-
-- Figure: [figure5_grodon_growth_comparison_hmm_allmatched.pdf](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.pdf)
-- Detailed statistics: [docs/GRODON2_FINAL_STATS.md](docs/GRODON2_FINAL_STATS.md)
