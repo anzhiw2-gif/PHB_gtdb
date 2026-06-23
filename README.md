@@ -161,6 +161,9 @@ python scripts/09_monitor_grodon_progress.py --once --no-clear
 
 ## 结果文档
 
+- [docs/README.md](docs/README.md): 文档地图，区分当前入口、方法细节和历史记录
+- [docs/PROJECT_TRACEABILITY.md](docs/PROJECT_TRACEABILITY.md): 每一步脚本、代码原理、科学原理和溯源表
+- [docs/RESULTS_AUDIT_2026-06-23.md](docs/RESULTS_AUDIT_2026-06-23.md): 服务器结果与 GitHub 内容审计记录
 - [docs/PRESENTATION_SUMMARY.md](docs/PRESENTATION_SUMMARY.md): 汇报用完整总结
 - [docs/RESULTS.md](docs/RESULTS.md): 统计结果汇总
 - [docs/METHODS.md](docs/METHODS.md): 方法细节
@@ -174,4 +177,5 @@ python scripts/09_monitor_grodon_progress.py --once --no-clear
 - `data/raw/`, `data/processed/`, `data/external/` 不上传 GitHub，因为包含 GTDB 原始数据、外部数据库和可再生中间文件。
 - `results/tables/` 和 `results/logs/` 默认不上传，因为服务器可重新生成，且可能持续更新。
 - `figures/nature/` 和 `figure_data/` 已纳入仓库，用于汇报和论文图复现。
+- 早期下载、解压和搜索监控脚本已归档到 `scripts/legacy_monitoring/`，当前主监控入口为 `scripts/09_monitor_grodon_progress.py`。
 - 所有关键运行参数、服务器路径和预期结果数量记录在 [RUN_MANIFEST.md](RUN_MANIFEST.md)。

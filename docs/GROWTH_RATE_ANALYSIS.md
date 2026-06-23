@@ -118,6 +118,28 @@ results/tables/grodon_growth_same_genus_summary_hmm_allmatched.tsv
 results/logs/grodon_growth_hmm_allmatched.out
 ```
 
+正式运行已完成。最终状态为：
+
+```text
+8,788 个基因组进入 gRodon2 全匹配分析
+8,735 个基因组 status=ok
+53 个基因组 failed
+3 个 status=ok 记录缺失有效 growth_rate_per_h
+8,692 个基因组进入严格同属平衡统计
+4,346 个 phaZ+
+4,346 个 phaZ-
+899 个属
+```
+
+平衡与统计检验命令：
+
+```bash
+python scripts/10_balance_grodon_by_genus.py --label hmm_allmatched
+python scripts/11_grodon_growth_stats.py --label hmm_allmatched
+```
+
+最终统计结果见 [GRODON2_FINAL_STATS.md](GRODON2_FINAL_STATS.md)。核心结论是：严格同属平衡后，未检测到 `phaZ+` 与 `phaZ-` 基因组之间显著的全局预测最大生长速率差异。
+
 监控：
 
 ```bash

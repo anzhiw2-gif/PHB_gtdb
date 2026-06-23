@@ -55,7 +55,7 @@ The repository tracks the lightweight source data and final Nature-style figures
 | Directory | Purpose |
 |---|---|
 | `figure_data/` | Lightweight source data used by `scripts/07_nature_figures.py` |
-| `figures/nature/` | Final Figure 1-4 outputs in PDF, PNG, and SVG |
+| `figures/nature/` | Final Figure 1-5 outputs in PDF, PNG, and SVG |
 | `figures/nature/source_data/` | Source data copied with the generated figures |
 
 Expected figure files:
@@ -65,6 +65,7 @@ figure1_workflow_funnel.pdf/png/svg
 figure2_phylum_heatmap.pdf/png/svg
 figure3_subtype_lipase.pdf/png/svg
 figure4_genera_phylogeny.pdf/png/svg
+figure5_grodon_growth_comparison_hmm_allmatched.pdf/png/svg
 ```
 
 Figure titles and captions are maintained in `docs/FIGURE_CAPTIONS.md`.
@@ -89,7 +90,10 @@ Key files:
 | `scripts/08_grodon_growth.py` | Build matched manifest, predict CDS/HEG, call gRodon2, summarize same-genus differences |
 | `scripts/08_run_grodon_one.R` | Single-genome `gRodon::predictGrowth` wrapper |
 | `scripts/09_monitor_grodon_progress.py` | Live terminal/PNG monitor for the all-matched gRodon2 run |
+| `scripts/10_balance_grodon_by_genus.py` | Create strict same-genus balanced `phaZ+`/`phaZ-` tables and failed-genome summaries |
+| `scripts/11_grodon_growth_stats.py` | Run genus-level statistical tests and generate Figure 5 |
 | `docs/GROWTH_RATE_ANALYSIS.md` | Design, pilot results, commands, and interpretation boundaries |
+| `docs/GRODON2_FINAL_STATS.md` | Final balanced statistics, Figure 5 interpretation, and result boundaries |
 
 Pilot status:
 
@@ -107,23 +111,24 @@ Formal all-matched manifest:
 903 genera
 ```
 
-Current formal run on T141:
+Formal all-matched run completed on T141:
 
-```bash
-python scripts/08_grodon_growth.py \
-  --heg-method hmm \
-  --threads 8 \
-  --marker-threads 1 \
-  --max-per-genus 0 \
-  --resume \
-  --output-label hmm_allmatched
+```text
+8,788 genomes processed
+8,735 status=ok
+53 failed
+3 status=ok records lacked a valid growth-rate value
+8,692 genomes retained after strict genus-level balancing
+4,346 phaZ+
+4,346 phaZ-
+899 genera retained for genus-level tests
 ```
 
-Live monitor:
+Final statistical result:
 
-```bash
-python scripts/09_monitor_grodon_progress.py \
-  --interval 60 \
-  --history results/tables/grodon_growth_monitor_history.tsv \
-  --plot results/figures/grodon_growth_progress.png
+```text
+Wilcoxon signed-rank P = 0.459
+Exact sign test P = 0.386
+Within-genus permutation P = 0.670
+Conclusion: no significant global growth-rate difference between phaZ+ and phaZ- genomes after strict same-genus balancing.
 ```

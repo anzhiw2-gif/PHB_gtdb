@@ -88,7 +88,7 @@ python scripts/check_results.py
 
 ## 5. Nature 风格图复现
 
-仓库已上传四张图及轻量源数据：
+仓库已上传五张图及轻量源数据：
 
 ```text
 figures/nature/
@@ -108,6 +108,7 @@ figures/nature/figure1_workflow_funnel.{pdf,png,svg}
 figures/nature/figure2_phylum_heatmap.{pdf,png,svg}
 figures/nature/figure3_subtype_lipase.{pdf,png,svg}
 figures/nature/figure4_genera_phylogeny.{pdf,png,svg}
+figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.{pdf,png,svg}
 ```
 
 图题和图注见 [FIGURE_CAPTIONS.md](FIGURE_CAPTIONS.md)。
@@ -147,7 +148,7 @@ nohup python scripts/08_grodon_growth.py \
   --max-per-genus 0 \
   --resume \
   --output-label hmm_allmatched \
-  > results/logs/grodon_growth_hmm_allmatched.out 2>&1 &
+ > results/logs/grodon_growth_hmm_allmatched.out 2>&1 &
 ```
 
 监控命令：
@@ -158,12 +159,22 @@ tail -40 results/logs/grodon_growth_hmm_allmatched.out
 wc -l results/tables/grodon_growth_predictions_hmm_allmatched.tsv
 ```
 
+完成后生成严格同属平衡表、失败基因组汇总、统计检验和 Figure 5：
+
+```bash
+python scripts/10_balance_grodon_by_genus.py --label hmm_allmatched
+python scripts/11_grodon_growth_stats.py --label hmm_allmatched
+```
+
 设计说明：
 
 - 只在含有 `phaZ+` 的属中寻找同属 `phaZ-` 对照。
 - 对每个属进行数量平衡，避免一边样本量过大。
 - `--max-per-genus 0` 表示不设每属上限，使用所有可平衡配对的基因组。
-- 当前全匹配 manifest 为 8,788 个基因组，即 4,394 个 `phaZ+` 和 4,394 个同属 `phaZ-`，覆盖 903 个属。
+- 全匹配 manifest 为 8,788 个基因组，即 4,394 个 `phaZ+` 和 4,394 个同属 `phaZ-`，覆盖 903 个属。
+- gRodon2 完成后，8,735 个基因组 `status=ok`，53 个失败；其中 3 个 `status=ok` 记录缺失有效生长速率。
+- 严格平衡后保留 8,692 个基因组，即 4,346 个 `phaZ+` 和 4,346 个 `phaZ-`，覆盖 899 个属。
+- 属水平检验未发现显著全局差异；详细结果见 [GRODON2_FINAL_STATS.md](GRODON2_FINAL_STATS.md)。
 
 ## 7. 可追溯记录
 

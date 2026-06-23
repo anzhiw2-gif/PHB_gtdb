@@ -30,6 +30,8 @@
 | `08_run_grodon_one.R` | gRodon formal | 对单个基因组运行 gRodon2 | 读取 CDS 和 HEG ID，调用 `gRodon::predictGrowth` | 标准输出中的 `RESULT` 行 |
 | `08_grodon_growth.py` | gRodon formal | 同属内 `phaZ+` vs `phaZ-` 最大生长速率预测 | Pyrodigal 预测 CDS，HMMER 标记核糖体 HEG，gRodon2 预测 doubling time，再按属汇总 | `results/tables/grodon_growth_*` |
 | `09_monitor_grodon_progress.py` | gRodon monitor | 实时监控 gRodon2 后台任务 | 读取 manifest、prediction table 和 nohup log，计算进度、速度、ETA，并可输出 PNG 进度图 | 终端 dashboard, optional history TSV/PNG |
+| `10_balance_grodon_by_genus.py` | gRodon statistics | 生成严格同属平衡比较表 | 只保留 `status=ok` 且有有效生长速率的记录；每个属取 `min(phaZ+, phaZ-)` 形成等量比较，并汇总失败基因组 | `grodon_growth_balanced_by_genus_*`, `grodon_failed_*` |
+| `11_grodon_growth_stats.py` | gRodon statistics + figure | 统计检验并生成 Figure 5 | 以属为主分析单位，计算 `mean(phaZ+) - mean(phaZ-)`，进行 sign test、Wilcoxon、属内置换检验和 bootstrap CI | `grodon_growth_statistical_tests_*`, `figure5_grodon_growth_comparison_*` |
 | `check_results.py` | QC | 检查关键结果是否齐全 | 按预期序列数、表格行数、tree 和 figure 文件存在性进行校验 | 终端 QC 报告 |
 
 ## Step 1: PhaZ 候选搜索
@@ -69,6 +71,10 @@ gRodon2 需要 CDS 和 highly expressed genes。项目使用 Pyrodigal 预测 CD
 - `grodon_growth_manifest_*.tsv`: 进入分析的同属配对清单
 - `grodon_growth_predictions_*.tsv`: 每个基因组的 gRodon2 预测结果
 - `grodon_growth_same_genus_summary_*.tsv`: 每个属的 `phaZ+` 与 `phaZ-` 均值差异
+- `grodon_growth_balanced_by_genus_*.tsv`: 严格同属平衡后的基因组级比较表
+- `grodon_growth_balanced_by_genus_summary_*.tsv`: 严格同属平衡后的属级均值差异表
+- `grodon_growth_statistical_tests_*.tsv`: 属水平统计检验结果
+- `figures/nature/figure5_grodon_growth_comparison_*.{pdf,png,svg}`: gRodon2 同属平衡分析图
 
 ## 结果校验
 
