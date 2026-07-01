@@ -27,7 +27,7 @@ GTDB release: R232
 | 古菌结果 | 初始 2 个短片段命中，最终 0 条高置信度 PhaZ |
 | 主导类群 | Pseudomonadota 占主导 |
 | 主导亚型 | 胞内型 PhaZ 为主 |
-| 生长速率扩展分析 | gRodon2 同属 `phaZ+` vs `phaZ-` 正在 T141 后台运行 |
+| 生长速率扩展分析 | gRodon2 同属 `phaZ+` vs `phaZ-`: 8,788 基因组, 899 属, **无显著差异** (p=0.459) |
 
 核心解释：PhaZ 不是单一高度保守蛋白，而是 alpha/beta hydrolase 相关的功能多样酶家族。因此本项目采用“先高置信度筛选，再按亚型独立分析”的路线，避免把胞外、胞内和新型 PhaZ 混在一棵树中造成错误解释。
 
@@ -101,6 +101,7 @@ PHB_gtdb/
     figure2_phylum_heatmap.pdf/png/svg
     figure3_subtype_lipase.pdf/png/svg
     figure4_genera_phylogeny.pdf/png/svg
+    figure5_grodon_growth_comparison_hmm_allmatched.pdf/png/svg
   figure_data/
     作图所需的轻量源数据
 ```
@@ -161,8 +162,25 @@ python scripts/09_monitor_grodon_progress.py \
 | Figure 2 | [figure2_phylum_heatmap.pdf](figures/nature/figure2_phylum_heatmap.pdf) | 门水平 PhaZ 分布与亚型热图 |
 | Figure 3 | [figure3_subtype_lipase.pdf](figures/nature/figure3_subtype_lipase.pdf) | 五类 PhaZ 亚型组成与 lipase box 验证 |
 | Figure 4 | [figure4_genera_phylogeny.pdf](figures/nature/figure4_genera_phylogeny.pdf) | Top 属分布与系统发育树概览 |
+| Figure 5 | [figure5_grodon_growth_comparison_hmm_allmatched.pdf](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.pdf) | gRodon2 同属 phaZ+ vs phaZ- 预测最大生长速率比较 |
 
 图题与图注见 [docs/FIGURE_CAPTIONS.md](docs/FIGURE_CAPTIONS.md)。
+
+![Figure 5](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.png)
+
+## gRodon2 生长速率分析结果
+
+| 指标 | 值 |
+|---|---:|
+| 分析基因组 | 8,788 (4,394 phaZ+ / 4,394 phaZ-) |
+| 平衡后保留 | 8,692 基因组, 899 属 |
+| 属均值 δ (growth/h) | -0.0027 (95% CI: -0.0155, +0.0093) |
+| Wilcoxon 符号秩检验 | p = 0.459 (不显著) |
+| 分层置换检验 | p = 0.670 (不显著) |
+| 效应量 r | 0.025 (可忽略) |
+| 结论 | **同属内 phaZ+ 与 phaZ- 无显著生长速率差异** |
+
+详细设计与统计见 [docs/GROWTH_RATE_ANALYSIS.md](docs/GROWTH_RATE_ANALYSIS.md)。
 
 ## 结果文档
 
