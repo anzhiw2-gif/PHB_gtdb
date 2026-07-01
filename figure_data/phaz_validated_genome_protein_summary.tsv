@@ -1,0 +1,8 @@
+metric	value
+validated_sequences	6532
+unique_genomes	5531
+unique_phyla	13
+unique_genera	1135
+mean_copies_per_genome	1.18
+single_copy_genomes	4682
+multi_copy_genomes	849

@@ -173,7 +173,9 @@ python scripts/09_monitor_grodon_progress.py \
 - [docs/METHODS.md](docs/METHODS.md): 方法细节
 - [docs/PIPELINE.md](docs/PIPELINE.md): 原始分析流程说明
 - [docs/PHAZ_REFERENCES.md](docs/PHAZ_REFERENCES.md): 14 条 PhaZ 参考序列
+- [docs/GENOME_VS_PROTEIN_COUNTS.md](docs/GENOME_VS_PROTEIN_COUNTS.md): **基因组数量 vs 蛋白序列数量** 详细解释
 - [docs/REVIEW.md](docs/REVIEW.md): 项目检查与改进建议
+- [docs/GROWTH_RATE_ANALYSIS.md](docs/GROWTH_RATE_ANALYSIS.md): gRodon2 扩展分析设计
 
 ## 数据追踪原则
 

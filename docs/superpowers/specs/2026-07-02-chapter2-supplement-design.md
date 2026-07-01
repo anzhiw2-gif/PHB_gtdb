@@ -58,14 +58,10 @@ Chapter 5  综合讨论与结论
 - **预计耗时**: 3-4h
 - **输出**: PhaC 树 + phaZ-phaC 共分布热图 → 用于 Fig 2.6B
 
-### T3 — 5 亚型代表序列 3D 结构预测
+### T3 — 5 亚型代表序列 3D 结构预测 【暂缓】
 
-- **输入**: 每亚型选 1-2 条代表性全长 PhaZ 序列
-- **方法**: AlphaFold2（GPU）或 ESMFold（CPU backup）
-- **运行**: T141 需确认 GPU 可用性；如无 GPU 用 ESMFold（每序列~10min）
-- **Skill**: 无直接 skill（手动运行 ColabFold/run_alphafold.py）
-- **预计耗时**: 1-2 天（取决于 GPU 可用性）
-- **输出**: 5-10 个 PDB 结构文件 → PyMOL 对比 → 用于 Fig 2.7A
+- **状态**: ⏸️ 暂缓。T141 无 GPU，ESMFold CPU 版可在需要时补充。
+- **决定**: 优先完成其他 6 个任务，硕士论文核心故事不需要 3D 结构。
 
 ### T4 — 催化域保守性深度分析
 

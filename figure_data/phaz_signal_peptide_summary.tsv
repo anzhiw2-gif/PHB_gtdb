@@ -1,0 +1,6 @@
+subtype	total	signal_positive	pct	mean_max_hydrophobicity
+intracellular	3668	285	7.8	0.79
+ralstonia	2221	190	8.6	0.78
+bacillus_type	5	0	0.0	1.16
+extracellular	404	32	7.9	0.59
+extracellular_lemoignei	234	39	16.7	0.86
