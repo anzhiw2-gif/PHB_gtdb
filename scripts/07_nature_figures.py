@@ -54,52 +54,52 @@ PALETTE = {
 }
 
 SUBTYPE_ORDER = [
-    "intracellular",
-    "ralstonia",
-    "extracellular",
-    "extracellular_lemoignei",
-    "bacillus_type",
+    "intracellular.cupriavidus_like",
+    "intracellular.ralstonia_like",
+    "intracellular.bacillus_like",
+    "extracellular.general",
+    "extracellular.lemoignei_like",
 ]
 
 SUBTYPE_LABELS = {
-    "intracellular": "Intracellular",
-    "ralstonia": "Ralstonia",
-    "extracellular": "Extracellular",
-    "extracellular_lemoignei": "Ext. lemoignei",
-    "bacillus_type": "Bacillus type",
+    "intracellular.cupriavidus_like": "Intra.\n(Cupriavidus)",
+    "intracellular.ralstonia_like": "Intra.\n(Ralstonia)",
+    "intracellular.bacillus_like": "Intra.\n(Bacillus)",
+    "extracellular.general": "Extra.\n(general)",
+    "extracellular.lemoignei_like": "Extra.\n(lemoignei)",
 }
 
 SUBTYPE_COLORS = {
-    "intracellular": "#4D7FB8",
-    "ralstonia": "#86A9D6",
-    "extracellular": "#3FA7A0",
-    "extracellular_lemoignei": "#8F6AB8",
-    "bacillus_type": "#C98544",
+    "intracellular.cupriavidus_like": "#2B5C8C",
+    "intracellular.ralstonia_like": "#5B92C5",
+    "intracellular.bacillus_like": "#94BFE5",
+    "extracellular.general": "#3FA7A0",
+    "extracellular.lemoignei_like": "#8F6AB8",
 }
 
 REF_TO_SUBTYPE = {
-    "BAA33394.1": "intracellular",
-    "CAJ93939.1": "intracellular",
-    "CAJ95805.1": "intracellular",
-    "UCA14981.1": "ralstonia",
-    "WKZ88401.1": "ralstonia",
-    "BAA19791.1": "extracellular",
-    "AAA87070.1": "extracellular",
-    "BAA35137.1": "extracellular",
-    "BAA32541.1": "extracellular",
-    "AAB02914.1": "extracellular",
-    "P52090.1": "extracellular_lemoignei",
-    "WP_207907290.1": "extracellular_lemoignei",
-    "WP_243656647.1": "extracellular_lemoignei",
-    "WP_128854079.1": "bacillus_type",
+    "BAA33394.1": "intracellular.cupriavidus_like",
+    "CAJ93939.1": "intracellular.cupriavidus_like",
+    "CAJ95805.1": "intracellular.cupriavidus_like",
+    "UCA14981.1": "intracellular.ralstonia_like",
+    "WKZ88401.1": "intracellular.ralstonia_like",
+    "BAA19791.1": "extracellular.general",
+    "AAA87070.1": "extracellular.general",
+    "BAA35137.1": "extracellular.general",
+    "BAA32541.1": "extracellular.general",
+    "AAB02914.1": "extracellular.general",
+    "P52090.1": "extracellular.lemoignei_like",
+    "WP_207907290.1": "extracellular.lemoignei_like",
+    "WP_243656647.1": "extracellular.lemoignei_like",
+    "WP_128854079.1": "intracellular.bacillus_like",
 }
 
 LIPASE_BOX_PERCENT = {
-    "intracellular": 10.1,
-    "ralstonia": 9.8,
-    "extracellular": 28.6,
-    "extracellular_lemoignei": 53.2,
-    "bacillus_type": 50.0,
+    "intracellular.cupriavidus_like": 10.1,
+    "intracellular.ralstonia_like": 9.8,
+    "intracellular.bacillus_like": 50.0,
+    "extracellular.general": 28.6,
+    "extracellular.lemoignei_like": 53.2,
 }
 
 
@@ -224,34 +224,34 @@ def prepare_source_data(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     tree_summary = pd.DataFrame(
         [
             {
-                "subtype": "bacillus_type",
+                "subtype": "intracellular.bacillus_like",
                 "tips": 57,
                 "method": "IQ-TREE",
-                "treefile": "phaz_bacillus_type_tree.treefile",
+                "treefile": "phaz_intracellular_bacillus_like_tree.treefile",
             },
             {
-                "subtype": "extracellular",
+                "subtype": "extracellular.general",
                 "tips": 509,
                 "method": "IQ-TREE",
-                "treefile": "phaz_extracellular_tree.treefile",
+                "treefile": "phaz_extracellular_general_tree.treefile",
             },
             {
-                "subtype": "extracellular_lemoignei",
+                "subtype": "extracellular.lemoignei_like",
                 "tips": 412,
                 "method": "IQ-TREE",
-                "treefile": "phaz_extracellular_lemoignei_tree.treefile",
+                "treefile": "phaz_extracellular_lemoignei_like_tree.treefile",
             },
             {
-                "subtype": "ralstonia",
+                "subtype": "intracellular.ralstonia_like",
                 "tips": 2776,
                 "method": "FastTree",
-                "treefile": "phaz_ralstonia_tree_ft.treefile",
+                "treefile": "phaz_intracellular_ralstonia_like_tree_ft.treefile",
             },
             {
-                "subtype": "intracellular",
+                "subtype": "intracellular.cupriavidus_like",
                 "tips": 4424,
                 "method": "FastTree",
-                "treefile": "phaz_intracellular_tree_ft.treefile",
+                "treefile": "phaz_intracellular_cupriavidus_like_tree_ft.treefile",
             },
         ]
     )
@@ -510,7 +510,7 @@ def figure3(stats: dict[str, pd.DataFrame]) -> None:
     ax_lip.set_xlim(0, 60)
     ax_lip.set_title("Catalytic motif support", loc="left", fontsize=8, pad=4)
     ax_lip.axvline(10, color=PALETTE["neutral_mid"], linestyle="--", linewidth=0.7)
-    ax_lip.text(10.8, -0.48, "intracellular baseline", fontsize=5.8, color=PALETTE["neutral_dark"])
+    ax_lip.text(10.8, -0.48, "intracellular baseline\n(~10%)", fontsize=5.8, color=PALETTE["neutral_dark"])
     for yi, value in zip(y, lip_values):
         ax_lip.text(value + 1.0, yi, f"{value:.1f}%", va="center", fontsize=6.4)
     ax_lip.grid(axis="x", color="#E5E5E5", linewidth=0.5)
@@ -582,9 +582,7 @@ def figure4(stats: dict[str, pd.DataFrame]) -> None:
         columnspacing=0.8,
     )
 
-    ordered_trees = tree_summary.set_index("subtype").loc[
-        ["intracellular", "ralstonia", "extracellular", "extracellular_lemoignei", "bacillus_type"]
-    ]
+    ordered_trees = tree_summary.set_index("subtype").loc[SUBTYPE_ORDER]
     for idx, (subtype, row) in enumerate(ordered_trees.iterrows()):
         ax = tree_axes[idx]
         if idx == 0:

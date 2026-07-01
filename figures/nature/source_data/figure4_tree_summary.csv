@@ -1,6 +1,6 @@
 subtype,tips,method,treefile
-bacillus_type,57,IQ-TREE,phaz_bacillus_type_tree.treefile
-extracellular,509,IQ-TREE,phaz_extracellular_tree.treefile
-extracellular_lemoignei,412,IQ-TREE,phaz_extracellular_lemoignei_tree.treefile
-ralstonia,2776,FastTree,phaz_ralstonia_tree_ft.treefile
-intracellular,4424,FastTree,phaz_intracellular_tree_ft.treefile
+intracellular.bacillus_like,57,IQ-TREE,phaz_intracellular_bacillus_like_tree.treefile
+extracellular.general,509,IQ-TREE,phaz_extracellular_general_tree.treefile
+extracellular.lemoignei_like,412,IQ-TREE,phaz_extracellular_lemoignei_like_tree.treefile
+intracellular.ralstonia_like,2776,FastTree,phaz_intracellular_ralstonia_like_tree_ft.treefile
+intracellular.cupriavidus_like,4424,FastTree,phaz_intracellular_cupriavidus_like_tree_ft.treefile
