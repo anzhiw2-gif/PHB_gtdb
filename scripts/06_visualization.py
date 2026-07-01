@@ -85,7 +85,7 @@ def plot_phb_gene_counts_heatmap(phb_counts: Path, taxonomy_df,
                                   logger: logging.Logger = None):
     """PHB 基因分布热图 (Top 基因组)。"""
     df = pd.read_csv(phb_counts, sep="\t")
-    gene_cols = [c for c in df.columns if c != "genome_id"]
+    gene_cols = [c for c in df.columns if c.endswith("_count")]
 
     if not gene_cols:
         return
@@ -181,7 +181,7 @@ def plot_phb_summary_dashboard(phb_counts: Path, phylum_summary: Path,
     # --- 子图 2: 基因类别分布 ---
     if phb_counts.exists():
         df = pd.read_csv(phb_counts, sep="\t")
-        gene_cols = [c for c in df.columns if c != "genome_id"]
+        gene_cols = [c for c in df.columns if c.endswith("_count")]
         if gene_cols:
             totals = {col: int(df[col].sum()) for col in gene_cols}
             names = list(totals.keys())
@@ -195,7 +195,7 @@ def plot_phb_summary_dashboard(phb_counts: Path, phylum_summary: Path,
     # --- 子图 3: 基因数分布直方图 ---
     if phb_counts.exists():
         df = pd.read_csv(phb_counts, sep="\t")
-        gene_cols = [c for c in df.columns if c != "genome_id"]
+        gene_cols = [c for c in df.columns if c.endswith("_count")]
         if gene_cols:
             df["total"] = df[gene_cols].sum(axis=1)
             axes[1, 0].hist(df["total"], bins=50, color="steelblue",
@@ -239,7 +239,7 @@ def generate_report(phb_counts: Path, phylum_summary: Path,
     # 基本统计
     if phb_counts.exists():
         df = pd.read_csv(phb_counts, sep="\t")
-        gene_cols = [c for c in df.columns if c != "genome_id"]
+        gene_cols = [c for c in df.columns if c.endswith("_count")]
         lines.append(f"Total genomes analyzed: {len(df):,}")
         lines.append(f"Genomes with PHB genes: {len(df):,}")
         lines.append("")

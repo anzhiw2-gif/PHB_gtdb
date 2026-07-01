@@ -29,6 +29,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config import *
 from utils import setup_logging, run_cmd, read_fasta, count_sequences
 
+PHAZ_SUBTYPES = [
+    "phaz_bacillus_type",
+    "phaz_extracellular",
+    "phaz_extracellular_lemoignei",
+    "phaz_intracellular",
+    "phaz_ralstonia",
+]
+
 
 def run_iqtree(alignment: Path, output_prefix: str, threads: int = 30,
                bootstrap: int = 1000, model: str = "MFP",
@@ -173,17 +181,34 @@ def main():
         alignment_files = {"custom": Path(args.input)}
     elif args.gene == "all":
         alignment_files = {}
-        for gene_name in PHB_GENES:
-            f = PROCESSED_DIR / f"{gene_name}_trimmed.fasta"
+        for subtype in PHAZ_SUBTYPES:
+            f = PROCESSED_DIR / f"{subtype}_trim.fasta"
             if not f.exists():
-                f = PROCESSED_DIR / f"{gene_name}_aligned.fasta"
+                f = PROCESSED_DIR / f"{subtype}_msa.fasta"
             if f.exists() and count_sequences(f) >= 3:
-                alignment_files[gene_name] = f
+                alignment_files[subtype] = f
+        if not alignment_files:
+            for gene_name in PHB_GENES:
+                f = PROCESSED_DIR / f"{gene_name}_trim.fasta"
+                if not f.exists():
+                    f = PROCESSED_DIR / f"{gene_name}_trimmed.fasta"
+                if not f.exists():
+                    f = PROCESSED_DIR / f"{gene_name}_msa.fasta"
+                if not f.exists():
+                    f = PROCESSED_DIR / f"{gene_name}_aligned.fasta"
+                if f.exists() and count_sequences(f) >= 3:
+                    alignment_files[gene_name] = f
     else:
-        f = PROCESSED_DIR / f"{args.gene}_trimmed.fasta"
-        if not f.exists():
-            f = PROCESSED_DIR / f"{args.gene}_aligned.fasta"
-        if not f.exists():
+        candidates = [
+            PROCESSED_DIR / f"{args.gene}_trim.fasta",
+            PROCESSED_DIR / f"{args.gene}_trimmed.fasta",
+            PROCESSED_DIR / f"{args.gene}_msa.fasta",
+            PROCESSED_DIR / f"{args.gene}_aligned.fasta",
+            PROCESSED_DIR / f"phaz_{args.gene}_trim.fasta",
+            PROCESSED_DIR / f"phaz_{args.gene}_msa.fasta",
+        ]
+        f = next((p for p in candidates if p.exists()), None)
+        if f is None:
             logger.error(f"比对文件不存在: {args.gene}")
             sys.exit(1)
         alignment_files = {args.gene: f}
@@ -202,7 +227,8 @@ def main():
         n_seqs = count_sequences(aln_file)
         logger.info(f"序列数: {n_seqs}")
 
-        tree_prefix = str(PROCESSED_DIR / f"{gene_name}_tree")
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+        tree_prefix = str(RESULTS_DIR / f"{gene_name}_tree")
 
         if args.method == "iqtree":
             # 检查 IQ-TREE 是否可用

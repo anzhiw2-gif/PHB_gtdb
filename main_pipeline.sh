@@ -57,7 +57,7 @@ log ""
 # === 环境检查 ===
 log "检查环境..."
 python3 --version | tee -a "$LOG_FILE"
-for tool in mafft fasttree hmmscan prodigal blastp; do
+for tool in diamond mafft trimal iqtree fasttree hmmscan cd-hit; do
     if command -v "$tool" &>/dev/null; then
         log "  $tool: $(command -v "$tool")"
     else
@@ -75,7 +75,7 @@ step1() {
     log "============================================"
 
     cd "$SCRIPTS_DIR"
-    python3 01_phb_search.py --threads "$THREADS" --resume 2>&1 | tee -a "$LOG_FILE"
+    python3 01_phb_search.py --threads "$THREADS" 2>&1 | tee -a "$LOG_FILE"
 
     if [ -f "../data/processed/phb_search_results.tsv" ]; then
         success "Step 1 完成"
@@ -96,10 +96,9 @@ step2() {
     log "============================================"
 
     cd "$SCRIPTS_DIR"
-    python3 02_extract_sequences.py --cdhit 0.95 2>&1 | tee -a "$LOG_FILE"
+    python3 02_extract_sequences.py --threads "$THREADS" 2>&1 | tee -a "$LOG_FILE"
 
-    if [ -f "../data/processed/phb_proteins_dedup.fasta" ] || \
-       [ -f "../data/processed/phb_proteins_annotated.fasta" ]; then
+    if [ -s "../data/processed/phaz_proteins_all.fasta" ]; then
         success "Step 2 完成"
     else
         error "Step 2 失败"
@@ -211,3 +210,8 @@ log "生成文件:"
 find "$(cd "$(dirname "$0")" && pwd)/results/" -type f 2>/dev/null | while read f; do
     log "  $f"
 done
+
+log ""
+log "运行结果校验..."
+cd "$SCRIPTS_DIR"
+python3 check_results.py 2>&1 | tee -a "$LOG_FILE" || warn "结果校验发现问题，请查看上方 PROBLEMS"

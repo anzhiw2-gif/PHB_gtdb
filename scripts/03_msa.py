@@ -23,6 +23,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config import *
 from utils import setup_logging, run_cmd, read_fasta, write_fasta, count_sequences
 
+PHAZ_SUBTYPES = [
+    "phaz_bacillus_type",
+    "phaz_extracellular",
+    "phaz_extracellular_lemoignei",
+    "phaz_intracellular",
+    "phaz_ralstonia",
+]
+
 
 def run_mafft(input_fasta: Path, output_fasta: Path, threads: int = 30,
               logger: logging.Logger = None) -> Path:
@@ -137,18 +145,27 @@ def main():
         input_files = {"input": Path(args.input)}
     elif args.gene == "all":
         input_files = {}
-        for gene_name in PHB_GENES:
-            f = PROCESSED_DIR / f"phb_{gene_name}.fasta"
+        for subtype in PHAZ_SUBTYPES:
+            f = PROCESSED_DIR / f"{subtype}.fasta"
             if f.exists():
-                input_files[gene_name] = f
-        # 也处理合并文件
-        combined = PROCESSED_DIR / "phb_proteins_annotated.fasta"
-        if combined.exists():
-            input_files["all_phb"] = combined
+                input_files[subtype] = f
+        if not input_files:
+            for gene_name in PHB_GENES:
+                f = PROCESSED_DIR / f"phb_{gene_name}.fasta"
+                if f.exists():
+                    input_files[gene_name] = f
+            combined = PROCESSED_DIR / "phaz_proteins_c95.fasta"
+            if combined.exists():
+                input_files["phaz_proteins_c95"] = combined
     else:
-        f = PROCESSED_DIR / f"phb_{args.gene}.fasta"
-        if not f.exists():
-            logger.error(f"文件不存在: {f}")
+        candidates = [
+            PROCESSED_DIR / f"{args.gene}.fasta",
+            PROCESSED_DIR / f"phaz_{args.gene}.fasta",
+            PROCESSED_DIR / f"phb_{args.gene}.fasta",
+        ]
+        f = next((p for p in candidates if p.exists()), None)
+        if f is None:
+            logger.error(f"文件不存在: {args.gene}")
             logger.info("请先运行 02_extract_sequences.py")
             sys.exit(1)
         input_files = {args.gene: f}
@@ -173,7 +190,7 @@ def main():
             continue
 
         # Step 1: MAFFT 比对
-        aligned_fasta = PROCESSED_DIR / f"{gene_name}_aligned.fasta"
+        aligned_fasta = PROCESSED_DIR / f"{gene_name}_msa.fasta"
         run_mafft(input_fasta, aligned_fasta, args.threads, logger)
 
         # 比对质量评估
@@ -182,7 +199,7 @@ def main():
 
         # Step 2: trimAl 修剪
         if not args.no_trim:
-            trimmed_fasta = PROCESSED_DIR / f"{gene_name}_trimmed.fasta"
+            trimmed_fasta = PROCESSED_DIR / f"{gene_name}_trim.fasta"
             run_trimal(aligned_fasta, trimmed_fasta, logger=logger)
 
             trim_stats = calculate_conservation(trimmed_fasta)

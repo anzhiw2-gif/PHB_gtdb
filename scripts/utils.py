@@ -7,6 +7,7 @@ import sys
 import gzip
 import subprocess
 import logging
+import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
@@ -100,9 +101,10 @@ def run_cmd(cmd: str, desc: str = "", timeout: int = None,
     if logger:
         logger.info(f"执行: {desc or cmd[:120]}")
 
+    bash = shutil.which("bash") or "/bin/bash"
     result = subprocess.run(
         cmd, shell=True, capture_output=True, text=True,
-        timeout=timeout, executable="/bin/bash"
+        timeout=timeout, executable=bash
     )
 
     if result.returncode != 0 and check:

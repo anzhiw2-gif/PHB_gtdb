@@ -1,0 +1,7 @@
+stage,count
+Bacterial DIAMOND hits,16486
+Extracted candidates,8768
+CD-HIT c95,8731
+>=100 aa,7478
+HMMer verified,6033
+Final validated union,6532

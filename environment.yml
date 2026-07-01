@@ -1,0 +1,30 @@
+name: phb_gtdb
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - biopython>=1.83
+  - pyrodigal>=3.6
+  - pandas>=2.0
+  - numpy>=1.24
+  - scipy>=1.10
+  - matplotlib>=3.7
+  - seaborn>=0.12
+  - pyyaml>=6.0
+  - tqdm>=4.65
+  - ete3>=3.1
+  - diamond
+  - blast
+  - hmmer
+  - cd-hit
+  - mafft
+  - trimal
+  - iqtree
+  - fasttree
+  - r-base
+  - r-ggplot2
+  - r-pheatmap
+  - pip
+  - pip:
+      - jupyter>=1.0.0
