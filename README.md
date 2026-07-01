@@ -166,22 +166,6 @@ python scripts/09_monitor_grodon_progress.py \
 
 图题与图注见 [docs/FIGURE_CAPTIONS.md](docs/FIGURE_CAPTIONS.md)。
 
-![Figure 5](figures/nature/figure5_grodon_growth_comparison_hmm_allmatched.png)
-
-## gRodon2 生长速率分析结果
-
-| 指标 | 值 |
-|---|---:|
-| 分析基因组 | 8,788 (4,394 phaZ+ / 4,394 phaZ-) |
-| 平衡后保留 | 8,692 基因组, 899 属 |
-| 属均值 δ (growth/h) | -0.0027 (95% CI: -0.0155, +0.0093) |
-| Wilcoxon 符号秩检验 | p = 0.459 (不显著) |
-| 分层置换检验 | p = 0.670 (不显著) |
-| 效应量 r | 0.025 (可忽略) |
-| 结论 | **同属内 phaZ+ 与 phaZ- 无显著生长速率差异** |
-
-详细设计与统计见 [docs/GROWTH_RATE_ANALYSIS.md](docs/GROWTH_RATE_ANALYSIS.md)。
-
 ## 结果文档
 
 - [docs/PRESENTATION_SUMMARY.md](docs/PRESENTATION_SUMMARY.md): 汇报用完整总结
