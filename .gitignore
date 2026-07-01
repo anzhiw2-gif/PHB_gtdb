@@ -46,3 +46,5 @@ Thumbs.db
 # Sensitive or machine-specific configuration
 config/
 server/
+
+.superpowers/
