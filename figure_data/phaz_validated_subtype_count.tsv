@@ -1,6 +1,6 @@
 subtype	sequences	pct	genomes
-intracellular	3668	56.2
-ralstonia	2221	34.0
-extracellular	404	6.2
-extracellular_lemoignei	234	3.6
-bacillus_type	5	0.1
+intracellular.cupriavidus_like	3668	56.2	3358
+intracellular.ralstonia_like	2221	34.0	2062
+extracellular.general	404	6.2	365
+extracellular.lemoignei_like	234	3.6	232
+intracellular.bacillus_like	5	0.1	5

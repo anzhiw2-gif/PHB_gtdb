@@ -304,7 +304,7 @@ def figure1(stats: dict[str, pd.DataFrame]) -> None:
     ax_flow.set_title("Genome-to-PhaZ workflow", loc="left", fontsize=8, pad=4)
 
     steps = [
-        ("1", "GTDB R232", "165,468 bacteria\n10,122 archaea"),
+        ("1", "GTDB R232", "189,801 bacteria\n10,122 archaea"),
         ("2", "Protein calling", "Pyrodigal\ntranslated ORFs"),
         ("3", "PhaZ search", "14 curated refs\nDIAMOND blastp"),
         ("4", "Candidate QC", "CD-HIT c95\nlength >=100 aa"),
