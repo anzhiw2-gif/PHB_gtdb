@@ -58,10 +58,14 @@ Chapter 5  综合讨论与结论
 - **预计耗时**: 3-4h
 - **输出**: PhaC 树 + phaZ-phaC 共分布热图 → 用于 Fig 2.6B
 
-### T3 — 5 亚型代表序列 3D 结构预测 【暂缓】
+### T3 — 5 亚型代表序列 3D 结构预测 ✅ 完成
 
-- **状态**: ⏸️ 暂缓。T141 无 GPU，ESMFold CPU 版可在需要时补充。
-- **决定**: 优先完成其他 6 个任务，硕士论文核心故事不需要 3D 结构。
+- **状态**: ✅ 完成（2026-07-02）。使用 ESM Atlas API (api.esmatlas.com)。
+- **方法**: POST 序列 → 返回 ESMFold v1 PDB。催化域截取（200-400aa）。
+- **结果**: 5/5 亚型代表序列获得 3D 结构 PDB 文件。
+  - Intra_Cupriavidus (300aa), Intra_Ralstonia (400aa), Intra_Bacillus (198aa)
+  - Extra_General (300aa), Extra_Lemoignei (200aa)
+- **脚本**: `scripts/t3_esm_api.py`
 
 ### T4 — 催化域保守性深度分析
 
